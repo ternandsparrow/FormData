@@ -1,7 +1,27 @@
 /* global FormData self Blob File */
 /* eslint-disable no-inner-declarations */
 
-if (typeof Blob !== 'undefined' && (typeof FormData === 'undefined' || !FormData.prototype.keys)) {
+;(async function checkIfPolyfillIsNeeded() {
+  if (typeof FormData === 'undefined' || !FormData.prototype.keys) {
+    return false
+  }
+  try {
+    await new Request('https://localhost', {
+      method: 'POST',
+      body: new FormData(),
+    }).arrayBuffer()
+    return true
+  } catch (err) {
+    return false
+  }
+})().then(function(isRequestSupportsFormData) {
+  if (typeof Blob === 'undefined' || isRequestSupportsFormData) {
+    return // polyfill not needed
+  }
+  loadPolyfill()
+})
+
+function loadPolyfill() {
   const global = typeof window === 'object'
     ? window
     : typeof self === 'object' ? self : this
