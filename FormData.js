@@ -1,27 +1,27 @@
-/* global FormData self Blob File */
+/* global FormData self Blob File Request */
 /* eslint-disable no-inner-declarations */
 
-;(async function checkIfPolyfillIsNeeded() {
+;(async function checkIfPolyfillIsNeeded () {
   if (typeof FormData === 'undefined' || !FormData.prototype.keys) {
     return false
   }
   try {
     await new Request('https://localhost', {
       method: 'POST',
-      body: new FormData(),
+      body: new FormData()
     }).arrayBuffer()
     return true
   } catch (err) {
     return false
   }
-})().then(function(isRequestSupportsFormData) {
+})().then(function (isRequestSupportsFormData) {
   if (typeof Blob === 'undefined' || isRequestSupportsFormData) {
     return // polyfill not needed
   }
   loadPolyfill()
 })
 
-function loadPolyfill() {
+function loadPolyfill () {
   const global = typeof window === 'object'
     ? window
     : typeof self === 'object' ? self : this
@@ -58,7 +58,7 @@ function loadPolyfill() {
   } catch (a) {
     global.File = function File (b, d, c) {
       const blob = new Blob(b, c)
-      const t = c && void 0 !== c.lastModified ? new Date(c.lastModified) : new Date()
+      const t = c && undefined !== c.lastModified ? new Date(c.lastModified) : new Date()
 
       Object.defineProperties(blob, {
         name: {
@@ -440,7 +440,7 @@ function loadPolyfill() {
     global.XMLHttpRequest.prototype.send = function (data) {
       // need to patch send b/c old IE don't send blob's type (#44)
       if (data instanceof FormDataPolyfill) {
-        const blob = data['_blob']()
+        const blob = data._blob()
         if (!this._hasContentType) this.setRequestHeader('Content-Type', blob.type)
         _send.call(this, blob)
       } else {
@@ -455,7 +455,7 @@ function loadPolyfill() {
 
     global.fetch = function (input, init) {
       if (init && init.body && init.body instanceof FormDataPolyfill) {
-        init.body = init.body['_blob']()
+        init.body = init.body._blob()
       }
 
       return _fetch.call(this, input, init)
@@ -466,11 +466,11 @@ function loadPolyfill() {
   if (_sendBeacon) {
     global.navigator.sendBeacon = function (url, data) {
       if (data instanceof FormDataPolyfill) {
-        data = data['_asNative']()
+        data = data._asNative()
       }
       return _sendBeacon.call(this, url, data)
     }
   }
 
-  global['FormData'] = FormDataPolyfill
+  global.FormData = FormDataPolyfill
 }

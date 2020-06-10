@@ -1,4 +1,4 @@
-/* global it describe assert expect Blob FormData */
+/* global it describe assert expect Blob FormData XMLHttpRequest */
 
 const native = window.FormData
 window.FormData = undefined
@@ -47,7 +47,7 @@ window.File = new Proxy(NativeFile, {
 
       // #78
       it('testEmptyFileInput', () => {
-        const fd = createForm(`<input name=foo type=file>`)
+        const fd = createForm('<input name=foo type=file>')
         assert.equal(fd.has('foo'), true)
         assert.equal(fd.get('foo').type, 'application/octet-stream')
       })
@@ -287,7 +287,7 @@ window.File = new Proxy(NativeFile, {
     describe('disabled', () => {
       it('Shold not include disabled fields', () => {
         const fd = createForm(
-          `<input disabled name=foo value=bar>`
+          '<input disabled name=foo value=bar>'
         )
         assert.deepEqual([...fd], [])
       })
