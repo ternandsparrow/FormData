@@ -1,7 +1,7 @@
 /* global FormData self Blob File Request */
 /* eslint-disable no-inner-declarations */
 
-;(async function checkIfPolyfillIsNeeded () {
+;(async function checkIfRequestSupportsFormData () {
   if (typeof FormData === 'undefined' || !FormData.prototype.keys) {
     return false
   }
